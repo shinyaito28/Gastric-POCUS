@@ -5,33 +5,26 @@ import { useState, useMemo } from "react";
 type AgeMode = "ym" | "months" | "dob";
 
 interface AgeInputProps {
-  value: number; // total months
+  value: number;
   onChange: (months: number) => void;
 }
 
 function calcMonthsFromDob(dob: string): number {
   if (!dob) return 0;
-  const birthDate = new Date(dob);
+  const birth = new Date(dob);
   const today = new Date();
-  let months = (today.getFullYear() - birthDate.getFullYear()) * 12;
-  months += today.getMonth() - birthDate.getMonth();
-  if (today.getDate() < birthDate.getDate()) months--;
-  return Math.max(0, months);
+  let m = (today.getFullYear() - birth.getFullYear()) * 12 + today.getMonth() - birth.getMonth();
+  if (today.getDate() < birth.getDate()) m--;
+  return Math.max(0, m);
 }
 
-function formatAgeLabel(totalMonths: number): string {
-  const years = Math.floor(totalMonths / 12);
-  const months = totalMonths % 12;
-  if (years === 0) return `${totalMonths}ヶ月`;
-  if (months === 0) return `${years}歳`;
-  return `${years}歳${months}ヶ月`;
+function fmtAge(m: number): string {
+  const y = Math.floor(m / 12);
+  const mo = m % 12;
+  if (y === 0) return `${m}ヶ月`;
+  if (mo === 0) return `${y}歳`;
+  return `${y}歳${mo}ヶ月`;
 }
-
-const MODE_LABELS: Record<AgeMode, string> = {
-  ym: "年・月",
-  months: "月齢",
-  dob: "生年月日",
-};
 
 export function AgeInput({ value, onChange }: AgeInputProps) {
   const [mode, setMode] = useState<AgeMode>("ym");
@@ -40,139 +33,115 @@ export function AgeInput({ value, onChange }: AgeInputProps) {
   const [totalMonths, setTotalMonths] = useState(String(value));
   const [dob, setDob] = useState("");
 
-  const handleModeChange = (newMode: AgeMode) => {
-    setMode(newMode);
-    if (newMode === "ym") {
-      setYears(String(Math.floor(value / 12)));
-      setMonths(String(value % 12));
-    } else if (newMode === "months") {
-      setTotalMonths(String(value));
-    }
+  const handleModeChange = (m: AgeMode) => {
+    setMode(m);
+    if (m === "ym") { setYears(String(Math.floor(value / 12))); setMonths(String(value % 12)); }
+    else if (m === "months") { setTotalMonths(String(value)); }
   };
 
-  const handleYmChange = (y: string, m: string) => {
-    setYears(y);
-    setMonths(m);
+  const handleYm = (y: string, m: string) => {
+    setYears(y); setMonths(m);
     onChange((parseInt(y) || 0) * 12 + (parseInt(m) || 0));
   };
 
-  const handleMonthsChange = (val: string) => {
-    setTotalMonths(val);
-    const v = parseInt(val);
-    if (!isNaN(v) && v >= 0) onChange(v);
-  };
+  const dobMonths = useMemo(() => dob ? calcMonthsFromDob(dob) : null, [dob]);
 
-  const handleDobChange = (val: string) => {
-    setDob(val);
-    if (val) onChange(calcMonthsFromDob(val));
-  };
-
-  const dobMonths = useMemo(() => (dob ? calcMonthsFromDob(dob) : null), [dob]);
-
-  const numInput = "px-2 py-1.5 bg-white/[0.08] rounded-md border border-white/10 text-slate-100 text-base font-mono outline-none text-center";
+  const inputCls = "px-3 py-2.5 bg-white/[0.06] rounded-lg border border-white/10 text-slate-100 text-lg font-mono outline-none";
+  const modeBtnBase = "px-2 py-0.5 text-[10px] font-semibold rounded transition-colors cursor-pointer border-none";
 
   return (
-    <div className="w-full max-w-full overflow-hidden">
-      <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-        Age (小児)
-      </label>
-
-      {/* Mode tabs */}
-      <div className="flex rounded-t-lg overflow-hidden border border-b-0 border-white/10">
-        {(["ym", "months", "dob"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => handleModeChange(m)}
-            className={`flex-1 py-2 text-[11px] font-semibold transition-colors border-none cursor-pointer ${
-              mode === m
-                ? "bg-sky-500/20 text-sky-400"
-                : "bg-transparent text-slate-500"
-            }`}
-          >
-            {MODE_LABELS[m]}
-          </button>
-        ))}
+    <div>
+      {/* Label + mode switcher in one row */}
+      <div className="flex items-center gap-2 mb-1.5">
+        <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          Age
+        </label>
+        <div className="flex gap-0.5 ml-auto">
+          {(["ym", "months", "dob"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => handleModeChange(m)}
+              className={`${modeBtnBase} ${
+                mode === m ? "bg-sky-500/25 text-sky-400" : "bg-transparent text-slate-600"
+              }`}
+            >
+              {m === "ym" ? "年月" : m === "months" ? "月齢" : "生年月日"}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Input area */}
-      <div className="bg-white/[0.06] rounded-b-lg border border-white/10 px-3 py-2 overflow-hidden">
-        {mode === "ym" && (
-          <div>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={years}
-                onChange={(e) => {
-                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                    handleYmChange(e.target.value, months);
-                }}
-                autoComplete="off"
-                className={`w-12 ${numInput}`}
-                placeholder="0"
-              />
-              <span className="text-slate-400 text-xs font-semibold shrink-0">歳</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={months}
-                onChange={(e) => {
-                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                    handleYmChange(years, e.target.value);
-                }}
-                autoComplete="off"
-                className={`w-12 ${numInput}`}
-                placeholder="0"
-              />
-              <span className="text-slate-400 text-xs font-semibold shrink-0">ヶ月</span>
-            </div>
-            <div className="text-[10px] text-slate-500 mt-1">= {value}ヶ月</div>
+      {/* Year + Month mode */}
+      {mode === "ym" && (
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center bg-white/[0.06] rounded-lg border border-white/10 overflow-hidden">
+            <input
+              type="text" inputMode="numeric" pattern="[0-9]*"
+              value={years}
+              onChange={(e) => { if (/^\d*$/.test(e.target.value)) handleYm(e.target.value, months); }}
+              autoComplete="off"
+              className="w-12 px-2 py-2.5 bg-transparent text-slate-100 text-lg font-mono outline-none text-center"
+              placeholder="0"
+            />
+            <span className="pr-2 text-slate-500 text-[13px] font-semibold">歳</span>
           </div>
-        )}
-
-        {mode === "months" && (
-          <div>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={totalMonths}
-                onChange={(e) => {
-                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                    handleMonthsChange(e.target.value);
-                }}
-                autoComplete="off"
-                className={`flex-1 min-w-0 ${numInput} !text-left !px-3`}
-                placeholder="0"
-              />
-              <span className="text-slate-400 text-xs font-semibold shrink-0">ヶ月</span>
-            </div>
-            {value > 0 && (
-              <div className="text-[10px] text-slate-500 mt-1">= {formatAgeLabel(value)}</div>
-            )}
+          <div className="flex items-center bg-white/[0.06] rounded-lg border border-white/10 overflow-hidden">
+            <input
+              type="text" inputMode="numeric" pattern="[0-9]*"
+              value={months}
+              onChange={(e) => { if (/^\d*$/.test(e.target.value)) handleYm(years, e.target.value); }}
+              autoComplete="off"
+              className="w-12 px-2 py-2.5 bg-transparent text-slate-100 text-lg font-mono outline-none text-center"
+              placeholder="0"
+            />
+            <span className="pr-2 text-slate-500 text-[13px] font-semibold">ヶ月</span>
           </div>
-        )}
+          <span className="text-[10px] text-slate-500">={value}m</span>
+        </div>
+      )}
 
-        {mode === "dob" && (
-          <div>
+      {/* Months mode */}
+      {mode === "months" && (
+        <div className="flex items-center bg-white/[0.06] rounded-lg border border-white/10 overflow-hidden">
+          <input
+            type="text" inputMode="numeric" pattern="[0-9]*"
+            value={totalMonths}
+            onChange={(e) => {
+              if (/^\d*$/.test(e.target.value)) {
+                setTotalMonths(e.target.value);
+                const v = parseInt(e.target.value);
+                if (!isNaN(v) && v >= 0) onChange(v);
+              }
+            }}
+            autoComplete="off"
+            className="flex-1 px-3 py-2.5 bg-transparent text-slate-100 text-lg font-mono outline-none w-full"
+            placeholder="0"
+          />
+          <span className="px-3 text-slate-500 text-[13px] font-semibold whitespace-nowrap">
+            ヶ月{value > 0 ? ` (${fmtAge(value)})` : ""}
+          </span>
+        </div>
+      )}
+
+      {/* DOB mode */}
+      {mode === "dob" && (
+        <div>
+          <div className="flex items-center bg-white/[0.06] rounded-lg border border-white/10 overflow-hidden">
             <input
               type="date"
               value={dob}
-              onChange={(e) => handleDobChange(e.target.value)}
+              onChange={(e) => { setDob(e.target.value); if (e.target.value) onChange(calcMonthsFromDob(e.target.value)); }}
               max={new Date().toISOString().split("T")[0]}
-              className="w-full px-3 py-1.5 bg-white/[0.08] rounded-md border border-white/10 text-slate-100 text-sm outline-none [color-scheme:dark]"
+              className="flex-1 px-3 py-2.5 bg-transparent text-slate-100 text-base outline-none w-full [color-scheme:dark]"
             />
-            {dobMonths !== null && (
-              <div className="text-[10px] text-slate-500 mt-1">
-                = {formatAgeLabel(dobMonths)} ({dobMonths}ヶ月)
-              </div>
-            )}
           </div>
-        )}
-      </div>
+          {dobMonths !== null && (
+            <div className="text-[10px] text-slate-500 mt-1 pl-1">
+              = {fmtAge(dobMonths)} ({dobMonths}ヶ月)
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
