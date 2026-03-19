@@ -72,7 +72,7 @@ export function AgeInput({ value, onChange }: AgeInputProps) {
   const numInput = "px-2 py-1.5 bg-white/[0.08] rounded-md border border-white/10 text-slate-100 text-base font-mono outline-none text-center";
 
   return (
-    <div className="w-full">
+    <div>
       <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
         Age (小児)
       </label>
@@ -95,59 +95,63 @@ export function AgeInput({ value, onChange }: AgeInputProps) {
       </div>
 
       {/* Input area */}
-      <div className="bg-white/[0.06] rounded-b-lg border border-white/10 px-3 py-2">
+      <div className="bg-white/[0.06] rounded-b-lg border border-white/10 px-3 py-2 overflow-hidden">
         {mode === "ym" && (
-          <div className="flex items-center gap-1">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={years}
-              onChange={(e) => {
-                if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                  handleYmChange(e.target.value, months);
-              }}
-              autoComplete="off"
-              className={`w-12 ${numInput}`}
-              placeholder="0"
-            />
-            <span className="text-slate-400 text-xs font-semibold">歳</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={months}
-              onChange={(e) => {
-                if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                  handleYmChange(years, e.target.value);
-              }}
-              autoComplete="off"
-              className={`w-12 ${numInput}`}
-              placeholder="0"
-            />
-            <span className="text-slate-400 text-xs font-semibold">ヶ月</span>
-            <span className="text-[10px] text-slate-500 ml-auto whitespace-nowrap">={value}m</span>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={years}
+                onChange={(e) => {
+                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
+                    handleYmChange(e.target.value, months);
+                }}
+                autoComplete="off"
+                className={`w-12 ${numInput}`}
+                placeholder="0"
+              />
+              <span className="text-slate-400 text-xs font-semibold shrink-0">歳</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={months}
+                onChange={(e) => {
+                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
+                    handleYmChange(years, e.target.value);
+                }}
+                autoComplete="off"
+                className={`w-12 ${numInput}`}
+                placeholder="0"
+              />
+              <span className="text-slate-400 text-xs font-semibold shrink-0">ヶ月</span>
+            </div>
+            <div className="text-[10px] text-slate-500 mt-1">= {value}ヶ月</div>
           </div>
         )}
 
         {mode === "months" && (
-          <div className="flex items-center gap-1.5">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={totalMonths}
-              onChange={(e) => {
-                if (e.target.value === "" || /^\d*$/.test(e.target.value))
-                  handleMonthsChange(e.target.value);
-              }}
-              autoComplete="off"
-              className={`flex-1 ${numInput} !text-left !px-3`}
-              placeholder="0"
-            />
-            <span className="text-slate-400 text-xs font-semibold whitespace-nowrap">ヶ月</span>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={totalMonths}
+                onChange={(e) => {
+                  if (e.target.value === "" || /^\d*$/.test(e.target.value))
+                    handleMonthsChange(e.target.value);
+                }}
+                autoComplete="off"
+                className={`flex-1 min-w-0 ${numInput} !text-left !px-3`}
+                placeholder="0"
+              />
+              <span className="text-slate-400 text-xs font-semibold shrink-0">ヶ月</span>
+            </div>
             {value > 0 && (
-              <span className="text-[10px] text-slate-500 whitespace-nowrap">={formatAgeLabel(value)}</span>
+              <div className="text-[10px] text-slate-500 mt-1">= {formatAgeLabel(value)}</div>
             )}
           </div>
         )}
@@ -162,7 +166,7 @@ export function AgeInput({ value, onChange }: AgeInputProps) {
               className="w-full px-3 py-1.5 bg-white/[0.08] rounded-md border border-white/10 text-slate-100 text-sm outline-none [color-scheme:dark]"
             />
             {dobMonths !== null && (
-              <div className="text-[10px] text-slate-500 mt-1 pl-0.5">
+              <div className="text-[10px] text-slate-500 mt-1">
                 = {formatAgeLabel(dobMonths)} ({dobMonths}ヶ月)
               </div>
             )}
