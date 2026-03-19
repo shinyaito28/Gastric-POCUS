@@ -78,7 +78,7 @@ export function Calculator({ mode, onModeChange, selectedPatient, onHistoryUpdat
   }, [result, csa, ageMonths, ageYears, weight, mode, risk, selectedPatient, onHistoryUpdated, onPatientUpdated]);
 
   return (
-    <div>
+    <div className="w-full min-w-0 overflow-hidden">
       {/* Selected patient indicator */}
       {selectedPatient && (
         <div className="mb-4 px-4 py-2.5 rounded-lg bg-sky-500/10 border border-sky-500/20">
