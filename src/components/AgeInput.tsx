@@ -72,7 +72,7 @@ export function AgeInput({ value, onChange }: AgeInputProps) {
   const numInput = "px-2 py-1.5 bg-white/[0.08] rounded-md border border-white/10 text-slate-100 text-base font-mono outline-none text-center";
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-hidden">
       <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
         Age (小児)
       </label>
