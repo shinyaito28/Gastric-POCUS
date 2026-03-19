@@ -74,23 +74,7 @@ export function GastricUltrasoundApp() {
       >
         <div className="max-w-[700px] mx-auto px-5 pb-0">
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-[10px] bg-navy-900 flex items-center justify-center shrink-0 border border-white/10">
-              <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
-                <defs>
-                  <linearGradient id="geminiGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#38bdf8"/>
-                    <stop offset="100%" stopColor="#8b5cf6"/>
-                  </linearGradient>
-                </defs>
-                {/* Gemini 4-point star */}
-                <path d="M50 10 C52 38, 62 48, 90 50 C62 52, 52 62, 50 90 C48 62, 38 52, 10 50 C38 48, 48 38, 50 10Z" fill="url(#geminiGrad)"/>
-                {/* Sparkle dots */}
-                <circle cx="50" cy="5" r="2" fill="#38bdf8" opacity="0.6"/>
-                <circle cx="50" cy="95" r="2" fill="#8b5cf6" opacity="0.6"/>
-                <circle cx="5" cy="50" r="2" fill="#38bdf8" opacity="0.6"/>
-                <circle cx="95" cy="50" r="2" fill="#8b5cf6" opacity="0.6"/>
-              </svg>
-            </div>
+            <img src="/icons/icon-192x192.png" alt="GUS" width={40} height={40} className="rounded-[10px] shrink-0" />
             <div>
               <h1 className="text-lg font-extrabold text-slate-100 tracking-tight leading-tight">
                 Gastric Ultrasound
