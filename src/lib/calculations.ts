@@ -1,11 +1,11 @@
 import type { RiskInfo } from "./types";
 
-/** Spencer et al. 2014 pediatric model */
+/** Spencer et al. 2015 pediatric model */
 export function calcPediatricVolume(csaCm2: number, ageMonths: number): number {
   return -7.8 + 3.5 * csaCm2 + 0.127 * ageMonths;
 }
 
-/** Perlas et al. 2013 adult model */
+/** Perlas et al. 2009 adult model */
 export function calcAdultVolume(csaCm2: number, ageYears: number): number {
   return 27.0 + 14.6 * csaCm2 - 1.28 * ageYears;
 }

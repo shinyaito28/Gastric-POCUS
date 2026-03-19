@@ -115,15 +115,18 @@ export function Calculator({ mode, onModeChange, selectedPatient, onHistoryUpdat
       </div>
 
       {/* Inputs */}
-      <div className="flex flex-wrap gap-3 mb-5">
+      <div className="flex flex-wrap gap-3 mb-3">
         <InputField label="Antral CSA (RLD)" value={csa} onChange={setCsa} unit="cm²" min={0} max={30} step={0.1} />
-        {mode === "pediatric" ? (
-          <AgeInput value={ageMonths} onChange={setAgeMonths} />
-        ) : (
+        {mode === "adult" && (
           <InputField label="Age" value={ageYears} onChange={setAgeYears} unit="years" min={18} max={100} />
         )}
         <InputField label="Body Weight" value={weight} onChange={setWeight} unit="kg" min={1} max={200} step={0.5} />
       </div>
+      {mode === "pediatric" && (
+        <div className="mb-5">
+          <AgeInput value={ageMonths} onChange={setAgeMonths} />
+        </div>
+      )}
 
       {/* Result */}
       {result && (
